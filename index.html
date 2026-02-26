@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Untuk Kamu 🤍</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:'Segoe UI',sans-serif;
+ color:white;
+ overflow:hidden;
+ background:linear-gradient(135deg,#ffdde1,#ee9ca7);
+ transition:background 2s;
+}
+.ending-bg{
+ background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);
+}
+.screen{
+ display:none;
+ height:100vh;
+ width:100vw;
+ padding:24px;
+ text-align:center;
+}
+.active{
+ display:flex;
+ flex-direction:column;
+ justify-content:center;
+ align-items:center;
+}
+input,button{
+ padding:14px 26px;
+ border:none;
+ border-radius:30px;
+ margin:10px;
+ font-size:16px;
+}
+button{
+ background:#ff4b6e;
+ color:white;
+ cursor:pointer;
+}
+.glow{text-shadow:0 0 18px rgba(255,255,255,0.7)}
+
+#text,#mono,#ending{
+ white-space:pre-line;
+ font-size:18px;
+ line-height:1.8;
+ max-width:720px;
+}
+
+/* ===== BOX ULTAH ===== */
+.box{
+ width:260px;
+ height:200px;
+ background:#ff4b6e;
+ border-radius:20px;
+ position:relative;
+ overflow:hidden;
+ animation:boxPop 1.5s forwards;
+}
+@keyframes boxPop{
+ from{transform:scale(0)}
+ to{transform:scale(1)}
+}
+.lid{
+ position:absolute;
+ top:0;
+ width:100%;
+ height:50px;
+ background:#ff6f91;
+ animation:openLid 2s forwards;
+}
+@keyframes openLid{
+ to{transform:translateY(-60px)}
+}
+.teddy{
+ font-size:80px;
+ position:absolute;
+ bottom:-80px;
+ left:50%;
+ transform:translateX(-50%);
+ animation:rise 2s forwards 1.5s;
+}
+@keyframes rise{
+ to{bottom:20px}
+}
+
+/* BUNGA */
+.flower{
+ position:fixed;
+ top:-20px;
+ animation:fall linear forwards;
+ font-size:22px;
+}
+@keyframes fall{
+ to{transform:translateY(110vh);opacity:0}
+}
+</style>
+</head>
+
+<body>
+
+<audio id="loveMusic" loop>
+ <source src="lagu-romantis.mp3" type="audio/mpeg">
+</audio>
+<audio id="bdayMusic" loop>
+ <source src="lagu-ulangtahun.mp3" type="audio/mpeg">
+</audio>
+
+<!-- SCREEN 1 -->
+<div class="screen active">
+ <h2>Masukkan nama kamu 🤍</h2>
+ <input id="nama" placeholder="Nama pasangan">
+ <button onclick="start()">Masuk</button>
+</div>
+
+<!-- SCREEN 2 -->
+<div class="screen">
+ <h2 id="hai"></h2>
+ <p>Aku punya sesuatu buat kamu…</p>
+ <button onclick="cekUltah()">Lanjut</button>
+</div>
+
+<!-- SCREEN 3 ULTAH -->
+<div class="screen">
+ <div class="box">
+  <div class="lid"></div>
+  <div class="teddy">🧸</div>
+ </div>
+ <p id="text" class="glow"></p>
+ <button onclick="peluk()">Peluk Aku 🤍</button>
+</div>
+
+<!-- SCREEN 4 MONOLOG -->
+<div class="screen">
+ <p id="mono" class="glow"></p>
+</div>
+
+<!-- SCREEN 5 ENDING -->
+<div class="screen">
+ <p id="ending" class="glow"></p>
+</div>
+
+<script>
+/* ===== KONFIG ===== */
+const tanggalLahir="2003-02-14"; // GANTI
+/* ================= */
+
+let screens=document.querySelectorAll(".screen");
+let nama="";
+
+const loveMusic=document.getElementById("loveMusic");
+const bdayMusic=document.getElementById("bdayMusic");
+
+function go(a,b){
+ screens[a].classList.remove("active");
+ screens[b].classList.add("active");
+}
+
+function start(){
+ nama=document.getElementById("nama").value||"Kamu";
+ document.getElementById("hai").innerText="Hai "+nama+" 🤍";
+ fadeIn(loveMusic);
+ go(0,1);
+}
+
+/* CEK TANGGAL ULTAH */
+function cekUltah(){
+ let now=new Date();
+ let lahir=new Date(tanggalLahir);
+ if(now.getDate()===lahir.getDate() && now.getMonth()===lahir.getMonth()){
+  go(1,2);
+  fadeOut(loveMusic,()=>{
+   fadeIn(bdayMusic);
+   typeText("text",bdayLines(),()=>flowers());
+  });
+ }else{
+  alert("Aku simpan kejutan ini sampai hari yang tepat 🤍");
+ }
+}
+
+/* UCAPAN ULTAH PANJANG */
+function bdayLines(){
+ let umur=hitungUmur();
+ return [
+  "Hari ini adalah tentang kamu.",
+  "",
+  nama+", kamu bertambah "+umur+" tahun.",
+  "",
+  "Aku harap di umur ini kamu",
+  "lebih lembut ke diri sendiri.",
+  "",
+  "Lebih percaya kalau kamu layak",
+  "dicintai sepenuhnya.",
+  "",
+  "Terima kasih sudah lahir.",
+  "Terima kasih sudah bertahan.",
+  "",
+  "Selamat ulang tahun 🤍"
+ ];
+}
+
+function hitungUmur(){
+ let l=new Date(tanggalLahir);
+ let n=new Date();
+ let u=n.getFullYear()-l.getFullYear();
+ let m=n.getMonth()-l.getMonth();
+ if(m<0||m===0&&n.getDate()<l.getDate()) u--;
+ return u;
+}
+
+/* PELUK */
+function peluk(){
+ vibrate();
+ go(2,3);
+ monolog();
+}
+
+/* BUNGA */
+function flowers(){
+ let end=Date.now()+3000;
+ let i=setInterval(()=>{
+  let f=document.createElement("div");
+  f.className="flower";
+  f.innerText="🌸";
+  f.style.left=Math.random()*100+"vw";
+  f.style.animationDuration=(4+Math.random()*3)+"s";
+  document.body.appendChild(f);
+  setTimeout(()=>f.remove(),7000);
+  if(Date.now()>end) clearInterval(i);
+ },150);
+}
+
+/* MONOLOG */
+function monolog(){
+ fadeOut(bdayMusic);
+ typeText("mono",[
+  "Aku nggak tahu masa depan seperti apa.",
+  "",
+  "Tapi aku tahu satu hal:",
+  "",
+  "aku mau menjalaninya",
+  "selama masih ada kamu."
+ ],()=>{
+  document.body.classList.add("ending-bg");
+  fadeIn(loveMusic);
+  go(3,4);
+  endingText();
+ });
+}
+
+/* ENDING */
+function endingText(){
+ typeText("ending",[
+  "Aku nggak janji sempurna.",
+  "",
+  "Aku cuma janji:",
+  "",
+  "aku milih kamu.",
+  "hari ini.",
+  "dan seterusnya."
+ ]);
+}
+
+/* UTIL */
+function typeText(id,arr,done){
+ let box=document.getElementById(id);
+ box.innerHTML="";
+ let i=0,j=0;
+ let t=setInterval(()=>{
+  if(i<arr.length){
+   if(j<arr[i].length){
+    box.innerHTML+=arr[i][j++];
+   }else{
+    box.innerHTML+="\n";
+    i++;j=0;
+   }
+  }else{
+   clearInterval(t);
+   if(done) done();
+  }
+ },65);
+}
+
+function fadeIn(a){
+ a.volume=0; a.play().catch(()=>{});
+ let v=0,i=setInterval(()=>{
+  v+=0.02; a.volume=v;
+  if(v>=0.6) clearInterval(i);
+ },200);
+}
+function fadeOut(a){
+ let v=a.volume,i=setInterval(()=>{
+  v-=0.02; a.volume=v;
+  if(v<=0){a.pause();clearInterval(i);}
+ },200);
+}
+
+function vibrate(){
+ if("vibrate" in navigator){
+  navigator.vibrate([200,100,200,100,300]);
+ }
+}
+</script>
+</body>
+</html>
